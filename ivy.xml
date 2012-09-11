@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://www.ivyrep.org/ivy-doc.xsl"?>
+<ivy-module version="1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://incubator.apache.org/ivy/schemas/ivy.xsd">
+
+	<info organisation="blau" module="airbrake-java" revision="${revision}" />
+
+	<configurations>
+		<include url="${ivy.default.conf.url}" />
+	</configurations>
+
+	<publications>
+		<artifact name="airbrake-java" />
+		<artifact name="airbrake-java" type="src" ext="src.zip" conf="testsupport" />
+	</publications>
+
+	<dependencies>
+		<dependency name="dependancer" rev="${revision}-+">
+			<conf name="runtime" mapped="junit.runtime" />
+		</dependency>
+	</dependencies>
+
+</ivy-module>
