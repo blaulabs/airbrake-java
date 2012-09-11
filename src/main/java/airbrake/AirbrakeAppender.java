@@ -4,11 +4,12 @@
 
 package airbrake;
 
-import org.apache.log4j.*;
-import org.apache.log4j.spi.*;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
 
 public class AirbrakeAppender extends AppenderSkeleton {
-	
+
 	private final AirbrakeNotifier airbrakeNotifier = new AirbrakeNotifier();
 
 	private String apiKey;
@@ -18,6 +19,8 @@ public class AirbrakeAppender extends AppenderSkeleton {
 	private boolean enabled;
 
 	private Backtrace backtrace = new QuietRubyBacktrace();
+
+	private String host;
 
 	public AirbrakeAppender() {
 		setThreshold(Level.ERROR);
@@ -31,10 +34,12 @@ public class AirbrakeAppender extends AppenderSkeleton {
 		setApi_key(apiKey);
 		setBacktrace(backtrace);
 	}
-
+	
 	@Override
 	protected void append(final LoggingEvent loggingEvent) {
-		if (!enabled) return;
+		if (!enabled) {
+			return;
+		}
 
 		if (thereIsThrowableIn(loggingEvent)) {
 			notifyThrowableIn(loggingEvent);
@@ -45,7 +50,8 @@ public class AirbrakeAppender extends AppenderSkeleton {
 	public void close() {}
 
 	public AirbrakeNotice newNoticeFor(final Throwable throwable) {
-		return new AirbrakeNoticeBuilderUsingFilteredSystemProperties(apiKey, backtrace, throwable, env).newNotice();
+		return new AirbrakeNoticeBuilderUsingFilteredSystemProperties(apiKey, backtrace, throwable, env, host)
+				.newNotice();
 	}
 
 	private int notifyThrowableIn(final LoggingEvent loggingEvent) {
@@ -71,6 +77,10 @@ public class AirbrakeAppender extends AppenderSkeleton {
 
 	public void setEnv(final String env) {
 		this.env = env;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	private boolean thereIsThrowableIn(final LoggingEvent loggingEvent) {

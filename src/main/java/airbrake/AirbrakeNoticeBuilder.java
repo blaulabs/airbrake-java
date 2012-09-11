@@ -39,33 +39,49 @@ public class AirbrakeNoticeBuilder {
 
 	private String component;
 
-	public AirbrakeNoticeBuilder(final String apiKey, final Backtrace backtraceBuilder, final Throwable throwable, final String env) {
-		this(apiKey, throwable.getMessage(), env);
+	private String host;
+
+	final static String DEFAULT_HOST = "api.airbrake.io";
+
+	public AirbrakeNoticeBuilder(final String apiKey, final Backtrace backtraceBuilder, final Throwable throwable,
+			final String env, final String host) {
+		this(apiKey, throwable.getMessage(), env, host);
 		this.backtraceBuilder = backtraceBuilder;
 		errorClass(throwable);
 		backtrace(throwable);
 	}
 
+	public AirbrakeNoticeBuilder(final String apiKey, final Backtrace backtraceBuilder, final Throwable throwable,
+			final String env) {
+		this(apiKey, backtraceBuilder, throwable, env, null);
+	}
+
 	public AirbrakeNoticeBuilder(final String apiKey, final String errorMessage) {
-		this(apiKey, errorMessage, "test");
+		this(apiKey, errorMessage, "test", null);
 	}
 
 	public AirbrakeNoticeBuilder(final String apiKey, final String errorMessage, final String env) {
+		this(apiKey, errorMessage, env, null);
+	}
+
+	public AirbrakeNoticeBuilder(final String apiKey, final String errorMessage, final String env, String host) {
 		apiKey(apiKey);
 		errorMessage(errorMessage);
 		env(env);
+		host(host);
 	}
 
 	public AirbrakeNoticeBuilder(final String apiKey, final Throwable throwable) {
-		this(apiKey, new Backtrace(), throwable, "test");
+		this(apiKey, new Backtrace(), throwable, "test", null);
 	}
 
 	public AirbrakeNoticeBuilder(final String apiKey, final Throwable throwable, final String env) {
-		this(apiKey, new Backtrace(), throwable, env);
+		this(apiKey, new Backtrace(), throwable, env, null);
 	}
 
-	public AirbrakeNoticeBuilder(final String apiKey, final Throwable throwable, final String projectRoot, final String env) {
-		this(apiKey, new Backtrace(), throwable, env);
+	public AirbrakeNoticeBuilder(final String apiKey, final Throwable throwable, final String projectRoot,
+			final String env) {
+		this(apiKey, new Backtrace(), throwable, env, null);
 		projectRoot(projectRoot);
 	}
 
@@ -156,7 +172,7 @@ public class AirbrakeNoticeBuilder {
 
 	public AirbrakeNotice newNotice() {
 		return new AirbrakeNotice(apiKey, projectRoot, environmentName, errorMessage, errorClass, backtrace, request, session, environment, environmentFilters,
-				hasRequest, url, component);
+				hasRequest, url, component, host);
 	}
 
 	private boolean notDefined(final Object object) {
@@ -178,5 +194,13 @@ public class AirbrakeNoticeBuilder {
 		environmentFilter("java.vendor.*");
 		environmentFilter("java.class.path");
 		environmentFilter("java.vm.specification.*");
+	}
+
+	protected void host(String host) {
+		if (notDefined(host)) {
+			this.host = DEFAULT_HOST;
+		} else {
+			this.host = host;
+		}
 	}
 }
